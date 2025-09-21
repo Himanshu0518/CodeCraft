@@ -6,6 +6,26 @@ import CodeMirror from "@uiw/react-codemirror";
 import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
+import { Link } from "react-router-dom";
+import { Code, Search, LogOut, UserPen } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/features/authSlice";
+import { logOut } from "../services/auth";
+import { motion, AnimatePresence } from "framer-motion";
+import {db} from "../config/firebase.config";
+import { doc, setDoc } from "firebase/firestore";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MdCheck, MdEdit } from "react-icons/md";
+import AlertMessage from "@/components/Alert";
+
 
 const NewProject = () => {
   const [html, setHtml] = useState("<h1>Hello World</h1>");
@@ -14,15 +34,23 @@ const NewProject = () => {
   );
   const [js, setJs] = useState("console.log('Hello World');");
   const [output, setOutput] = useState("");
+  const user = useSelector((state) => state.auth.userData);
+  const dispatch = useDispatch();
+  const [isTitle, setIsTitle] = useState(false);
+  const [title, setTitle] = useState("Untitled");
+  const [alert , setAlert] = useState(null);
+
+
+  const handleLogout = async () => {
+    await logOut();
+    dispatch(logout());
+  };
 
   useEffect(() => {
     const updateOutput = () => {
       const combinedOutput = `
-<!DOCTYPE html>
-<html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Live Preview</title>
 <style>${css}</style>
 </head>
@@ -37,9 +65,192 @@ const NewProject = () => {
     updateOutput();
   }, [html, css, js]);
 
+const saveProgram = async () => {
+  console.log("Save button clicked");
+  const id = `${Date.now()}`;
+  const _doc = {
+    id,
+    html,
+    css,
+    js,
+    title,
+    user,
+    output,
+  };
+
+  try {
+    await setDoc(doc(db, "Projects", id), _doc);
+    // setAlert expects a single message or an object, depending on your alert implementation
+    setAlert({ show: true, message: "Project saved successfully!", type: "success" });
+
+    // Optional: auto-hide alert after 3 seconds
+    setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+  } catch (err) {
+    console.error("Error saving project:", err);
+    setAlert({ show: true, message: "Error saving project!", type: "error" });
+
+    setTimeout(() => setAlert({ ...alert, show: false }), 2000);
+  }
+};
+
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden bg-slate-900">
-      <header></header>
+     
+
+      {alert && <AlertMessage type={alert.type} message={alert.message} show={alert.show} />}
+    
+      <header className="w-full h-20 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shadow-md">
+        {/* Left Section: Logo + Title */}
+        <div className="flex items-center gap-8">
+          {/* Logo */}
+          <Link
+            to="/home"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+          >
+            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
+              <Code className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-white tracking-wide">
+              CodeCraft
+            </span>
+          </Link>
+
+          {/* Editable Title */}
+          <div className="flex items-center gap-2">
+            <AnimatePresence mode="wait">
+              {isTitle ? (
+                <motion.input
+                  key="titleInput"
+                  type="text"
+                  placeholder="Untitled Project"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                  className="px-3 py-2 rounded-md bg-slate-800 text-white text-sm border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              ) : (
+                <motion.p
+                  key="titleLabel"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                  className="text-lg font-medium text-slate-200 px-3"
+                >
+                  {title || "Untitled Project"}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait">
+              {isTitle ? (
+                <motion.button
+                  key="MdCheck"
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  onClick={() => setIsTitle(false)}
+                  className="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
+                >
+                  <MdCheck />
+                </motion.button>
+              ) : (
+                <motion.button
+                  key="MdEdit"
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  onClick={() => setIsTitle(true)}
+                  className="p-2 rounded-lg hover:bg-slate-800 text-slate-300"
+                >
+                  <MdEdit />
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* follow section */}
+          <div className="flex items-center gap-3">
+            {/* Username */}
+            <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">
+              {user ? user.displayName : user.email?.split("@")[0]}
+            </p>
+
+            {/* Follow Button */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-semibold shadow-md cursor-pointer"
+            >
+              + Follow
+            </motion.button>
+          </div>
+        </div>
+    
+
+        {/* Right Section: Save + User */}
+        <div className="flex items-center gap-5">
+          {/* Save Button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-semibold shadow-lg transition-colors"
+            onClick={saveProgram}
+          >
+            Save
+          </motion.button>
+
+          {/* User Dropdown */}
+          <motion.div whileHover={{ scale: 1.05 }} className="relative">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-700 shadow-md overflow-hidden">
+                  {user.photoURL ? (
+                    <motion.img
+                      src={user.photoURL}
+                      alt="User Avatar"
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="text-sm font-medium text-white"
+                    >
+                      {user.email
+                        ? user.email.slice(0, 2).toUpperCase()
+                        : user.displayName.slice(0, 2).toUpperCase()}
+                    </motion.span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent
+                align="end"
+                className="w-52 bg-slate-900 border border-slate-700 rounded-lg p-2 text-white shadow-lg"
+              >
+                <DropdownMenuLabel className="px-2 py-1 text-xs uppercase tracking-wider text-slate-400">
+                  My Account
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-slate-700" />
+                <DropdownMenuItem className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-slate-800 cursor-pointer">
+                  Profile <UserPen className="w-4 h-4 text-slate-400" />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleLogout()}
+                  className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-slate-800 cursor-pointer"
+                >
+                  Logout <LogOut className="w-4 h-4 text-red-400" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </motion.div>
+        </div>
+      </header>
 
       <SplitPane split="horizontal" minSize={150} defaultSize="60%">
         {/* Top code section */}
