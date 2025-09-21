@@ -1,4 +1,84 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* SplitPane resizer styles */
+.Resizer {
+  background: #ffffff;
+  opacity: 0.2;
+  z-index: 1;
+  box-sizing: border-box;
+  background-clip: padding-box;
+}
 
+.Resizer:hover {
+  transition: all 0.2s ease;
+}
 
+.Resizer.horizontal {
+  height: 11px;
+  margin: -5px 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  cursor: row-resize;
+  width: 100%;
+}
+
+.Resizer.horizontal:hover {
+  border-top: 5px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 5px solid rgba(255, 255, 255, 0.5);
+}
+
+.Resizer.vertical {
+  width: 11px;
+  margin: 0 -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  cursor: col-resize;
+}
+
+.Resizer.vertical:hover {
+  border-left: 5px solid rgba(255, 255, 255, 0.5);
+  border-right: 5px solid rgba(255, 255, 255, 0.5);
+}
+
+.Resizer.disabled {
+  cursor: not-allowed;
+}
+.Resizer.disabled:hover {
+  border-color: transparent;
+}
+
+/* Pane backgrounds (optional for light editors) */
+.pane1 {
+  background-color: #f0f0f0;
+}
+.pane2 {
+  background-color: #e0e0e0;
+}
+.pane3 {
+  background-color: #d0d0d0;
+}
+
+/* CodeMirror dark theme overrides */
+.CodeMirror {
+  height: 100% !important;
+  color: #fff;
+  background: #0f172a !important; /* slate-900 */
+  padding-top: 0 !important;
+}
+.CodeMirror-gutters {
+  background: #0f172a !important; /* slate-900 */
+  border-right: 1px solid #1e293b !important; /* slate-800 */
+}
+.CodeMirror-scroll {
+  background: #0f172a !important; /* slate-900 */
+}
+
+/* Fix CodeMirror UI background for @uiw theme */
+.ͼo {
+  background: #0f172a !important; /* slate-900 */
+}
+
+/* Ensure SplitPane doesn't overlap header */
+.SplitPane.horizontal {
+  top: 100px !important;
+}

@@ -2,12 +2,13 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import RootLayout from "@/layouts/RootLayout";
 import { Home, LoginPage, SignupPage } from "./pages";
 import AuthLayout from "./layouts/AuthLayout";
+import NewProject from "./pages/NewProject";
 
 const router = createBrowserRouter([
   // protected routes
   {
     path: "/",
-    element: <AuthLayout authentication={true} />, // wraps all protected routes
+    element: <AuthLayout authentication={true} />, 
     children: [
       {
         path: "home",
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
           // other nested pages
         ],
       },
+      {
+        path:"home/newProject",
+        element:<NewProject/>
+      }
     ],
   },
  // public routes 
