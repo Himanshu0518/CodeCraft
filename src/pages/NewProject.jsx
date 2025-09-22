@@ -7,13 +7,13 @@ import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
 import { Link } from "react-router-dom";
-import { Code, Search, LogOut, UserPen } from "lucide-react";
+import { Code, LogOut, UserPen } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import {db} from "../config/firebase.config";
-import { doc, setDoc , serverTimestamp} from "firebase/firestore";
+import { doc, setDoc , serverTimestamp, query, where, getDocs, collection} from "firebase/firestore";
 
 import {
   DropdownMenu,
@@ -25,6 +25,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MdCheck, MdEdit } from "react-icons/md";
 import AlertMessage from "@/components/Alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 const NewProject = () => {
@@ -39,6 +49,9 @@ const NewProject = () => {
   const [isTitle, setIsTitle] = useState(false);
   const [title, setTitle] = useState("Untitled");
   const [alert , setAlert] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [existingDocId, setExistingDocId] = useState(null);
+
 
 
   const handleLogout = async () => {
@@ -68,42 +81,84 @@ const NewProject = () => {
   updateOutput();
 }, [html, css, js]);
 
+const checkAndSave = async () => {
+    console.log("Save button clicked");
 
-const saveProgram = async () => {
-  console.log("Save button clicked");
-  const id = `${Date.now()}`;
-  const _doc = {
-    id,
-    html,
-    css,
-    js,
-    title,
-    user,
-    output,
-     timestamp: serverTimestamp(),
+
+    const q = query(
+      collection(db, "Projects"),
+      where("title", "==", title),
+      where("user.uid", "==", user.uid)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      setExistingDocId(querySnapshot.docs[0].id);
+      setOpenDialog(true);
+    } else {
+      await saveProjectToDB(`${Date.now()}`);
+    }
   };
-      
-  try {
-    await setDoc(doc(db, "Projects", id), _doc);
-    // setAlert expects a single message or an object, depending on your alert implementation
-    setAlert({ show: true, message: "Project saved successfully!", type: "success" });
+const saveProjectToDB = async (id) => {
+    const _doc = {
+      id,
+      html,
+      css,
+      js,
+      title,
+      user,
+      output,
+      timestamp: serverTimestamp(),
+    };
 
-    // Optional: auto-hide alert after 3 seconds
-    setTimeout(() => setAlert({ ...alert, show: false }), 3000);
-  } catch (err) {
-    console.error("Error saving project:", err);
-    setAlert({ show: true, message: "Error saving project!", type: "error" });
+    try {
+      await setDoc(doc(db, "Projects", id), _doc, { merge: true }); // ✅ overwrite if exists
+      setAlert({
+        show: true,
+        message: existingDocId ? "Project overridden successfully!" : "Project saved successfully!",
+        type: "success",
+      });
 
-    setTimeout(() => setAlert({ ...alert, show: false }), 2000);
-  }
-};
+      setTimeout(() => setAlert({ show: false }), 3000);
+    } catch (err) {
+      console.error("Error saving project:", err);
+      setAlert({
+        show: true,
+        message: "Error saving project!",
+        type: "error",
+      });
+
+      setTimeout(() => setAlert({ show: false }), 2000);
+    }
+  };
 
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden bg-slate-900">
      
 
       {alert && <AlertMessage type={alert.type} message={alert.message} show={alert.show} />}
-    
+         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Project already exists</AlertDialogTitle>
+            <AlertDialogDescription>
+              A project with the same title already exists. Do you want to override it?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                saveProjectToDB(existingDocId); // ✅ Use same doc ID → overwrite
+                setOpenDialog(false);
+              }}
+            >
+              Override
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <header className="w-full h-20 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shadow-md">
         {/* Left Section: Logo + Title */}
         <div className="flex items-center gap-8">
@@ -200,7 +255,7 @@ const saveProgram = async () => {
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-semibold shadow-lg transition-colors"
-            onClick={saveProgram}
+            onClick={checkAndSave }
           >
             Save
           </motion.button>
