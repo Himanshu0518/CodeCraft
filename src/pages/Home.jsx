@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useSelector , useDispatch} from "react-redux";
+import { useSelector } from "react-redux";
 import ProjectCard from "../components/ProjectCard";
 
 function Home() {
@@ -33,10 +33,10 @@ useEffect(() => {
 
         {
           filtered?.length > 0 ? filtered.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
+            <ProjectCard key={project.id} project={project} index={index} projectId={project.id} />
           )) :
         projects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} />
+          <ProjectCard key={project.id} project={project} index={index} projectId={project.id} />
         ))}
         
       </div>

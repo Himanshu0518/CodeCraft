@@ -1,5 +1,6 @@
 import React from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -7,9 +8,11 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 items-center">
         {/* Brand Section */}
         <div>
-          <h2 className="text-3xl font-extrabold text-white tracking-wide">
-            CodeCraft
-          </h2>
+          <Link to="/home">
+            <h2 className="text-3xl font-extrabold text-white tracking-wide">
+              CodeCraft
+            </h2>
+          </Link>
           <p className="mt-3 text-gray-400 text-sm leading-relaxed">
             Build, share and explore coding projects in one place.
           </p>

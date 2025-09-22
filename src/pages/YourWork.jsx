@@ -35,7 +35,7 @@ function YourWork() {
     <div className="flex-1 min-h-screen bg-slate-950 overflow-y-auto p-6 pt-8">
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {(filtered?.length > 0 ? filtered : projects).map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} />
+          <ProjectCard key={project.id} project={project} index={index} projectId={project.id} />
         ))}
       </div>
     </div>

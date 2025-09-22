@@ -6,12 +6,12 @@ import CodeMirror from "@uiw/react-codemirror";
 import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Code, LogOut, UserPen } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { db } from "../config/firebase.config";
 import {
   doc,
@@ -31,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MdCheck, MdEdit } from "react-icons/md";
+
 import AlertMessage from "@/components/Alert";
 import {
   AlertDialog,
@@ -44,34 +44,23 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const NewProject = () => {
-  const initialHtml = "<h1>Hello World</h1>";
-  const initialCss =
-    "body { font-family: sans-serif; color: white; background-color: #1e293b; }";
-  const initialJs = "console.log('Hello World');";
+const Project = () => {
+  const params = useParams();
+  const projectList = useSelector((state) => state.project.projectList);
 
-  const [html, setHtml] = useState(initialHtml);
-  const [css, setCss] = useState(initialCss);
-  const [js, setJs] = useState(initialJs);
-  const [output, setOutput] = useState(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Live Preview</title>
-  <style>${initialCss}</style>
-</head>
-<body>
-  ${initialHtml}
-  <script>${initialJs}</script>
-</body>
-</html>
-`);
+  const project = projectList.find(
+    (project) => project.id === params.projectId
+  );
 
+
+  const [html, setHtml] = useState(project.html);
+  const [css, setCss] = useState(project.css);
+  const [js, setJs] = useState(project.js);
+  const [output, setOutput] = useState(project.output);
   const user = useSelector((state) => state.auth.userData);
   const dispatch = useDispatch();
-  const [isTitle, setIsTitle] = useState(false);
-  const [title, setTitle] = useState("Untitled");
+  //   const [isTitle, setIsTitle] = useState(false);
+  //   const [title, setTitle] = useState("Untitled");
   const [alert, setAlert] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [existingDocId, setExistingDocId] = useState(null);
@@ -80,6 +69,12 @@ const NewProject = () => {
     await logOut();
     dispatch(logout());
   };
+
+  useEffect(() => {
+    setHtml(project.html);
+    setCss(project.css);
+    setJs(project.js);
+  }, [project]);
 
   useEffect(() => {
     const updateOutput = () => {
@@ -108,7 +103,7 @@ const NewProject = () => {
 
     const q = query(
       collection(db, "Projects"),
-      where("title", "==", title),
+      where("title", "==", project.title),
       where("user.uid", "==", user.uid)
     );
     const querySnapshot = await getDocs(q);
@@ -121,6 +116,7 @@ const NewProject = () => {
     }
   };
   const saveProjectToDB = async (id) => {
+    const title = project.title;
     const _doc = {
       id,
       html,
@@ -137,7 +133,7 @@ const NewProject = () => {
       setAlert({
         show: true,
         message: existingDocId
-          ? "changes saved successfully!"
+          ? "Project overridden successfully!"
           : "Project saved successfully!",
         type: "success",
       });
@@ -177,7 +173,7 @@ const NewProject = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                saveProjectToDB(existingDocId); // ✅ Use same doc ID → overwrite
+                saveProjectToDB(existingDocId);
                 setOpenDialog(false);
               }}
             >
@@ -205,87 +201,47 @@ const NewProject = () => {
 
           {/* Editable Title */}
           <div className="flex items-center gap-2">
-            <AnimatePresence mode="wait">
-              {isTitle ? (
-                <motion.input
-                  key="titleInput"
-                  type="text"
-                  placeholder="Untitled Project"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 5 }}
-                  className="px-3 py-2 rounded-md bg-slate-800 text-white text-sm border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              ) : (
-                <motion.p
-                  key="titleLabel"
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 5 }}
-                  className="text-lg font-medium text-slate-200 px-3"
-                >
-                  {title || "Untitled Project"}
-                </motion.p>
-              )}
-            </AnimatePresence>
-
-            <AnimatePresence mode="wait">
-              {isTitle ? (
-                <motion.button
-                  key="MdCheck"
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{ scale: 1.1 }}
-                  onClick={() => setIsTitle(false)}
-                  className="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
-                >
-                  <MdCheck />
-                </motion.button>
-              ) : (
-                <motion.button
-                  key="MdEdit"
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{ scale: 1.1 }}
-                  onClick={() => setIsTitle(true)}
-                  className="p-2 rounded-lg hover:bg-slate-800 text-slate-300"
-                >
-                  <MdEdit />
-                </motion.button>
-              )}
-            </AnimatePresence>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">
+                {project.title}
+              </p>
+            </div>
           </div>
 
           {/* follow section */}
-          <div className="flex items-center gap-3">
-            {/* Username */}
-            <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">
-              {user ? user.displayName : user.email?.split("@")[0]}
-            </p>
+          {user.uid !== project.user.uid && (
+            <div className="flex items-center gap-3">
+              {/* Username */}
+              <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">
+                {user ? user.displayName : user.email?.split("@")[0]}
+              </p>
 
-            {/* Follow Button */}
-            {/* <motion.button
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300, damping: 15 }}
-              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-semibold shadow-md cursor-pointer"
-            >
-              + Follow
-            </motion.button> */}
-          </div>
+              {/* Follow Button */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-semibold shadow-md cursor-pointer"
+              >
+                + Follow
+              </motion.button>
+            </div>
+          )}
         </div>
 
         {/* Right Section: Save + User */}
         <div className="flex items-center gap-5">
           {/* Save Button */}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05 }}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-semibold shadow-lg transition-colors"
-            onClick={checkAndSave}
-          >
-            Save
-          </motion.button>
+          {user.uid === project.user.uid && (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-semibold shadow-lg transition-colors"
+              onClick={checkAndSave}
+            >
+              Save
+            </motion.button>
+          )}
 
           {/* User Dropdown */}
           <motion.div whileHover={{ scale: 1.05 }} className="relative">
@@ -433,4 +389,4 @@ const NewProject = () => {
   );
 };
 
-export default NewProject;
+export default Project;
