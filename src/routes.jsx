@@ -3,6 +3,7 @@ import RootLayout from "@/layouts/RootLayout";
 import { Home, LoginPage, SignupPage } from "./pages";
 import AuthLayout from "./layouts/AuthLayout";
 import NewProject from "./pages/NewProject";
+import YourWork from "./pages/YourWork";
 
 const router = createBrowserRouter([
   // protected routes
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
         element: <RootLayout />, // Outlet renders this
         children: [
           { path: "", element: <Home /> },
+          {path : "yourWork", element: <YourWork />},
           // other nested pages
         ],
       },

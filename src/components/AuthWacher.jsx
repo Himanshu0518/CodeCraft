@@ -3,26 +3,32 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { login, logout } from "@/features/authSlice";
 import { auth, db } from "../config/firebase.config";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  query,
+  orderBy,
+  collection,
+  onSnapshot,
+} from "firebase/firestore";
 import Spinner from "@/animations/Spinner";
-
+import { setProjects } from "../features/projectSlice";
 
 const AuthWatcher = ({ children }) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
-   
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Dispatch login immediately
+        // ✅ Dispatch login
         dispatch(
           login({
             userData: firebaseUser.providerData[0],
           })
         );
 
-        // Save/update user in Firestore
+        // ✅ Save/update user in Firestore
         try {
           await setDoc(
             doc(db, "users", firebaseUser.uid),
@@ -33,17 +39,41 @@ const AuthWatcher = ({ children }) => {
           console.error("Error saving user to Firestore:", err);
         }
       } else {
-        
-       
-        dispatch(logout);
+        dispatch(logout()); // ✅ call logout() instead of passing the function
       }
 
-      // Stop loading
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-  });
+  }, [dispatch]);
+
+  useEffect(() => {
+    const projectquery = query(
+      collection(db, "Projects"),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsubscribe = onSnapshot(projectquery, (snapshot) => {
+      const projects = snapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+
+        return {
+          id: docSnap.id,
+          ...data,
+          // ✅ Ensure timestamp is serializable
+          timestamp: data.timestamp
+            ? data.timestamp.toMillis()
+            : null,
+        };
+      });
+
+      console.log(projects);
+      dispatch(setProjects(projects));
+    });
+
+    return unsubscribe;
+  }, [dispatch]);
 
   if (isLoading) {
     return (

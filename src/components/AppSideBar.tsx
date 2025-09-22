@@ -1,5 +1,5 @@
-import { Home, Code, Heart, Bookmark } from "lucide-react"
-import {Link} from "react-router-dom"
+import { Home, Code, Heart, Bookmark } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import {
   Sidebar,
@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // Menu items
 const items = [
@@ -26,7 +26,7 @@ const items = [
   },
   {
     title: "Your Work",
-    url: "#",
+    url: "/home/yourWork",
     icon: Code,
   },
   {
@@ -34,7 +34,7 @@ const items = [
     url: "#",
     icon: Bookmark,
   },
-]
+];
 
 export function AppSidebar() {
   return (
@@ -42,13 +42,14 @@ export function AppSidebar() {
       {/* Header / Brand */}
       <SidebarHeader className="px-6 py-6 border-b border-slate-800">
         <div className="flex items-center">
-          <Link to="/home" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          <Link
+            to="/home"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+          >
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <Code className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-white">
-              CodeCraft
-            </span>
+            <span className="text-xl font-semibold text-white">CodeCraft</span>
           </Link>
         </div>
       </SidebarHeader>
@@ -57,14 +58,14 @@ export function AppSidebar() {
         {/* Start Coding Button */}
         <SidebarGroup className="mb-6 mt-2">
           <SidebarGroupContent>
-            <SidebarMenuButton asChild>
-              <Link
-                to=""
-                className="flex items-center justify-center px-4 py-3 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-900 transition-colors"
-              >
-                Start Coding
-              </Link>
-            </SidebarMenuButton>
+            <Link
+              to="/home/newProject"
+              className="flex items-center justify-center px-4 py-3 rounded-lg 
+             bg-slate-800 text-white text-sm font-medium 
+             hover:bg-slate-900 transition-colors"
+            >
+              Start Coding
+            </Link>
           </SidebarGroupContent>
         </SidebarGroup>
 
@@ -75,13 +76,13 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
+                    <Link
+                      to={item.url}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                     >
                       <item.icon className="w-5 h-5" />
                       <span className="text-sm font-medium">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -90,5 +91,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }

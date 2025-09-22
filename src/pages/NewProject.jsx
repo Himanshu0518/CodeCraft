@@ -13,7 +13,7 @@ import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import {db} from "../config/firebase.config";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc , serverTimestamp} from "firebase/firestore";
 
 import {
   DropdownMenu,
@@ -47,23 +47,27 @@ const NewProject = () => {
   };
 
   useEffect(() => {
-    const updateOutput = () => {
-      const combinedOutput = `
-
+  const updateOutput = () => {
+    const combinedOutput = `
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Live Preview</title>
-<style>${css}</style>
+  <meta charset="UTF-8">
+  <title>Live Preview</title>
+  <style>${css}</style>
 </head>
-<body>${html}
-<script>${js}</script>
+<body>
+  ${html}
+  <script>${js}</script>
 </body>
 </html>
 `;
-      setOutput(combinedOutput);
-    };
+    setOutput(combinedOutput);
+  };
 
-    updateOutput();
-  }, [html, css, js]);
+  updateOutput();
+}, [html, css, js]);
+
 
 const saveProgram = async () => {
   console.log("Save button clicked");
@@ -76,8 +80,9 @@ const saveProgram = async () => {
     title,
     user,
     output,
+     timestamp: serverTimestamp(),
   };
-
+      
   try {
     await setDoc(doc(db, "Projects", id), _doc);
     // setAlert expects a single message or an object, depending on your alert implementation

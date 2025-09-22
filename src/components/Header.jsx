@@ -12,15 +12,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { setSearchTerm } from "../features/searchSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.userData);
+  const searchTerm = useSelector((state)=> state.searchTerm?.searchTerm ? state.searchTerm.searchTerm : null);
 
+  const MotionLink = motion(Link);
   const handleLogout = async () => {
     await logOut();
     dispatch(logout());
   };
+
   return (
     <>
       <div className="w-full  bg-slate-950/95 backdrop-blur-sm sticky top-0 z-10 pt-5">
@@ -34,17 +39,21 @@ const Header = () => {
                   type="text"
                   placeholder="Search projects, collections, and more..."
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
+                  value={searchTerm || ""}
+                  onChange = {(e)=> dispatch(setSearchTerm(e.target.value))}
                 />
               </div>
             </div>
 
-            <motion.button
-              className="px-4 py-2 rounded-xl bg-blue-400 hover:bg-blue-600 
-             text-white text-sm font-medium shadow-sm 
-             transition-colors duration-200"
+            <MotionLink
+              to="/home/newProject"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-block px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 
+                 text-white text-sm font-medium shadow-md transition-colors duration-200"
             >
               Create
-            </motion.button>
+            </MotionLink>
 
             {/* Profile Dropdown */}
             <motion.div whileHover={{ scale: 1.1 }}>
