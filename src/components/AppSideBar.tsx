@@ -1,5 +1,5 @@
 import { Home, Code, Heart, Bookmark } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   Sidebar,
@@ -12,11 +12,10 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
-// Menu items
 const items = [
   {
     title: "Home",
-    url: "home/projects",
+    url: "/home",
     icon: Home,
   },
   {
@@ -31,15 +30,17 @@ const items = [
   },
   {
     title: "Bookmarks",
-    url: "#",
+    url: "/home/bookmarks",
     icon: Bookmark,
   },
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
+
   return (
     <Sidebar className="bg-slate-950 border-r border-slate-800 w-64">
-      {/* Header / Brand */}
+      {/* Brand / Logo */}
       <SidebarHeader className="px-6 py-6 border-b border-slate-800">
         <div className="flex items-center">
           <Link
@@ -61,8 +62,10 @@ export function AppSidebar() {
             <Link
               to="/home/newProject"
               className="flex items-center justify-center px-4 py-3 rounded-lg 
-             bg-slate-800 text-white text-sm font-medium 
-             hover:bg-slate-900 transition-colors"
+                bg-gradient-to-r from-indigo-600 to-purple-600 
+                text-white text-sm font-medium shadow-md
+                hover:from-indigo-500 hover:to-purple-500 
+                transition-colors"
             >
               Start Coding
             </Link>
@@ -72,20 +75,28 @@ export function AppSidebar() {
         {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      to={item.url}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                    >
-                      <item.icon className="w-5 h-5" />
-                      <span className="text-sm font-medium">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            <SidebarMenu className="space-y-3">
+              {items.map((item) => {
+                const isActive = location.pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        to={item.url}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                          ${
+                            isActive
+                              ? "bg-slate-800 text-white"
+                              : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                          }`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

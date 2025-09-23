@@ -130,6 +130,7 @@ const NewProject = () => {
       user,
       output,
       timestamp: serverTimestamp(),
+      bookmarksCount: 0,
     };
 
     try {

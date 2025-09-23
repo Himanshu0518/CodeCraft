@@ -21,14 +21,14 @@ const AuthWatcher = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // ✅ Dispatch login
+       
         dispatch(
           login({
             userData: firebaseUser.providerData[0],
           })
         );
 
-        // ✅ Save/update user in Firestore
+       
         try {
           await setDoc(
             doc(db, "users", firebaseUser.uid),
@@ -39,7 +39,7 @@ const AuthWatcher = ({ children }) => {
           console.error("Error saving user to Firestore:", err);
         }
       } else {
-        dispatch(logout()); // ✅ call logout() instead of passing the function
+        dispatch(logout());
       }
 
       setIsLoading(false);
@@ -61,7 +61,7 @@ const AuthWatcher = ({ children }) => {
         return {
           id: docSnap.id,
           ...data,
-          // ✅ Ensure timestamp is serializable
+          
           timestamp: data.timestamp
             ? data.timestamp.toMillis()
             : null,

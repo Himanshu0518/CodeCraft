@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, LogOut, UserPen } from "lucide-react";
+import { Search, LogOut, UserPen, Plus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,9 @@ import { setSearchTerm } from "../features/searchSlice";
 const Header = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.userData);
-  const searchTerm = useSelector((state)=> state.searchTerm?.searchTerm ? state.searchTerm.searchTerm : null);
+  const searchTerm = useSelector((state) =>
+    state.searchTerm?.searchTerm ? state.searchTerm.searchTerm : null
+  );
 
   const MotionLink = motion(Link);
   const handleLogout = async () => {
@@ -40,7 +42,7 @@ const Header = () => {
                   placeholder="Search projects, collections, and more..."
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
                   value={searchTerm || ""}
-                  onChange = {(e)=> dispatch(setSearchTerm(e.target.value))}
+                  onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                 />
               </div>
             </div>
@@ -49,9 +51,13 @@ const Header = () => {
               to="/home/newProject"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-block px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 
-                 text-white text-sm font-medium shadow-md transition-colors duration-200"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl 
+             bg-gradient-to-r from-blue-500 to-indigo-600 
+             text-white text-sm font-semibold shadow-lg 
+             hover:from-blue-600 hover:to-indigo-700 
+             transition-all duration-200"
             >
+              <Plus className="w-4 h-4" />
               Create
             </MotionLink>
 

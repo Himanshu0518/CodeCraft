@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import SplitPane from "react-split-pane";
-import { FaChevronDown, FaHtml5, FaCss3, FaJs } from "react-icons/fa";
+import { FaChevronDown, FaHtml5, FaCss3, FaJs,FaBookmark  } from "react-icons/fa";
 import { IoIosSettings } from "react-icons/io";
 import CodeMirror from "@uiw/react-codemirror";
 import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
 import { Link, useParams } from "react-router-dom";
-import { Code, LogOut, UserPen } from "lucide-react";
+import { Code, LogOut, UserPen,Bookmark} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
@@ -22,6 +22,11 @@ import {
   getDocs,
   collection,
 } from "firebase/firestore";
+import {
+  isBookMarked,
+  bookmarkProject,
+  unbookmarkProject,
+} from "../services/bookmark";
 
 import {
   DropdownMenu,
@@ -64,10 +69,26 @@ const Project = () => {
   const [alert, setAlert] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [existingDocId, setExistingDocId] = useState(null);
+ const [bookmarked, setBookmarked] = useState(false);
+ 
 
   const handleLogout = async () => {
     await logOut();
     dispatch(logout());
+  };
+
+    useEffect(() => {
+    isBookMarked(user.uid, project.id).then(setBookmarked);
+  }, [project.id, user.uid]);
+
+  const handleToggleBookmark = async () => {
+    if (bookmarked) {
+      await unbookmarkProject(user.uid, project.id);
+      setBookmarked(false);
+    } else {
+      await bookmarkProject(user.uid, project.id);
+      setBookmarked(true);
+    }
   };
 
   useEffect(() => {
@@ -228,9 +249,25 @@ const Project = () => {
             </div>
           )}
         </div>
-
+       
         {/* Right Section: Save + User */}
         <div className="flex items-center gap-5">
+
+             {/* Bookmark Icon */}
+        {
+            bookmarked? (
+              <div>
+                <FaBookmark 
+                className="w-8 h-8 text-white cursor-pointer" 
+                onClick={handleToggleBookmark}/>
+              </div>
+            ) : (
+              <div>
+                <Bookmark className="w-8 h-8 text-white cursor-pointer"
+                 onClick={handleToggleBookmark} />
+              </div>
+            )
+          } 
           {/* Save Button */}
           {user.uid === project.user.uid && (
             <motion.button

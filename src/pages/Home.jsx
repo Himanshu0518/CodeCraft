@@ -24,12 +24,12 @@ useEffect(() => {
 
 
   return (
-    <div className="flex-1 min-h-screen bg-slate-950 overflow-y-auto p-6 pt-8">
+   <div className="flex-1 min-h-screen bg-slate-950 overflow-y-auto p-6 pt-8">
       {/* Header Section */}
       {/* <h1 className="text-white text-2xl font-bold mb-6">Home Page</h1> */}
 
       {/* Project Cards Container */}
-      <div className="flex flex-wrap gap-6">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
         {
           filtered?.length > 0 ? filtered.map((project, index) => (

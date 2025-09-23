@@ -1,49 +1,60 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import RootLayout from "@/layouts/RootLayout";
-import { Home, LoginPage, SignupPage, YourWork, NewProject, Project  } from "./pages";
+import { Home, LoginPage, SignupPage, YourWork, NewProject, Project, Bookmarks } from "./pages";
 import AuthLayout from "./layouts/AuthLayout";
 
 const router = createBrowserRouter([
-  // protected routes
   {
-    path: "/",
+    path: "/home",
     element: <AuthLayout authentication={true} />,
     children: [
       {
-        path: "home",
-        element: <RootLayout />, // Outlet renders this
+        path: "",
+        element: <RootLayout />, 
         children: [
-          { path: "", element: <Home /> },
-          { path: "yourWork", element: <YourWork /> },
-          // other nested pages
+          { 
+            index: true, // Use index instead of empty path
+            element: <Home /> 
+          }, 
+          { 
+            path: "yourWork", 
+            element: <YourWork /> 
+          }, 
+          { 
+            path: "bookmarks", 
+            element: <Bookmarks /> 
+          }, 
         ],
       },
-      {
-        path: "home/newProject",
-        element: <NewProject />,
+      { 
+        path: "newProject", 
+        element: <NewProject /> 
       },
-      {
-        path: "home/project/:projectId",
-        element: <Project />,
-      }
+      { 
+        path: "project/:projectId", 
+        element: <Project /> 
+      }, 
     ],
   },
-  // public routes
   {
     path: "/",
     element: <AuthLayout authentication={false} />,
     children: [
-      {
-        path: "/login",
-        element: <LoginPage />,
+      { 
+        path: "login", 
+        element: <LoginPage /> 
       },
-      {
-        path: "/signup",
-        element: <SignupPage />,
+      { 
+        path: "signup", 
+        element: <SignupPage /> 
       },
-      {
-        path: "*",
-        element: <Navigate to="/home" replace />,
+      { 
+        path: "", 
+        element: <Navigate to="/home" replace /> 
+      },
+      { 
+        path: "*", 
+        element: <Navigate to="/home" replace /> 
       },
     ],
   },
