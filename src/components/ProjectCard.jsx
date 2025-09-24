@@ -5,10 +5,14 @@ const ProjectCard = ({ project, index, projectId }) => {
   return (
     <motion.div
       key={index}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
       className="w-full max-w-[450px] h-[280px] sm:h-[320px] md:h-[350px] bg-slate-800 rounded-md flex flex-col shadow-lg cursor-pointer overflow-hidden p-1 mx-auto"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.2 }}
+      
     >
       {/* Live Preview */}
       <div className="flex-1 border-b border-slate-700 overflow-hidden bg-white">
