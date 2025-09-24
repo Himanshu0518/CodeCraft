@@ -15,11 +15,6 @@ const bookmarkProject = async (userId, projectId) => {
       bookmarkedAt: serverTimestamp(),
     });
 
-    // // Increment count in project
-    // await updateDoc(doc(db, "projects", projectId), {
-    //   bookmarksCount: increment(1),
-    // });
-
     console.log("Bookmarked!");
   } catch (error) {
     console.error("Error bookmarking project:", error);
@@ -30,11 +25,6 @@ const unbookmarkProject = async (userId, projectId) => {
   try {
     // Remove bookmark from user's subcollection
     await deleteDoc(doc(db, "users", userId, "bookmarks", projectId));
-
-    // Decrement count in project
-    // await updateDoc(doc(db, "projects", projectId), {
-    //   bookmarksCount: increment(-1),
-    // });
 
     console.log("Unbookmarked!");
   } catch (error) {
@@ -48,8 +38,6 @@ const getBookmarkedProjects = async (userId) => {
 
   const projectIds = snapshot.docs.map((doc) => doc.id);
 
-  // now fetch actual project docs
-  // you can loop or batch with where("id", "in", projectIds)
   return projectIds;
 };
 

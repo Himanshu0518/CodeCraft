@@ -5,4 +5,7 @@ import NewProject from './NewProject';
 import YourWork from './YourWork';
 import Project from './Project';
 import Bookmarks from './Bookmarks';
-export { Home, LoginPage, SignupPage, NewProject, YourWork , Project , Bookmarks};
+import Following from './Following';
+import Profile from './Profile';
+
+export { Home, LoginPage, SignupPage, NewProject, YourWork , Project , Bookmarks, Following, Profile };

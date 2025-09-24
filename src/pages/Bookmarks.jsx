@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import ProjectCard from "../components/ProjectCard";
 import { getBookmarkedProjects } from "../services/bookmark";
-import {FaStar} from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 
 function Bookmarks() {
   const user = useSelector((state) => state.auth.userData);
@@ -36,9 +36,7 @@ function Bookmarks() {
 
   // Memoize projects to avoid unnecessary recalculations
   const projects = useMemo(() => {
-    return projectList.filter((project) =>
-      projectIds.includes(project.id)
-    );
+    return projectList.filter((project) => projectIds.includes(project.id));
   }, [projectList, projectIds]);
 
   // Apply search filter with proper dependencies
@@ -71,15 +69,14 @@ function Bookmarks() {
           ))
         ) : (
           <div className="flex flex-col items-center justify-center w-full py-20">
-  <p className="text-slate-300 text-lg font-medium flex items-center gap-2">
-    < FaStar className="text-yellow-500" /> 
-    <p>No bookmarked projects found</p>
-  </p>
-  <p className="text-slate-500 text-sm mt-2">
-    Start exploring and bookmark projects you like!
-  </p>
-</div>
-
+            <div className="text-slate-300 text-lg font-medium flex items-center gap-2">
+              <FaStar className="text-yellow-500" />
+              <p>No bookmarked projects found</p>
+            </div>
+            <p className="text-slate-500 text-sm mt-2">
+              Start exploring and bookmark projects you like!
+            </p>
+          </div>
         )}
       </div>
     </div>

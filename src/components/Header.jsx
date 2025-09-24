@@ -83,8 +83,8 @@ const Header = () => {
                         transition={{ duration: 0.2 }}
                       >
                         {user.email
-                          ? user.email.slice(0, 2).toUpperCase()
-                          : user.displayName.slice(0, 2).toUpperCase()}
+                          ? user.email.slice(0, 1).toUpperCase()
+                          : user.displayName.slice(0, 1).toUpperCase()}
                       </motion.span>
                     )}
                   </button>
@@ -99,7 +99,10 @@ const Header = () => {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-slate-700" />
                   <DropdownMenuItem className="flex items-center justify-between hover:bg-slate-800 cursor-pointer">
-                    Profile <UserPen className="w-4 h-4 text-slate-400" />
+                    <Link to={`/home/profile/${user.uid}`} className="flex items-center gap-2">
+                     Profile <UserPen className="w-4 h-4 text-slate-400" />
+                     </Link>
+                   
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="flex items-center justify-between hover:bg-slate-800 cursor-pointer"

@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
 import SplitPane from "react-split-pane";
-import { FaChevronDown, FaHtml5, FaCss3, FaJs,FaBookmark  } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaHtml5,
+  FaCss3,
+  FaJs,
+  FaBookmark,
+} from "react-icons/fa";
 import { IoIosSettings } from "react-icons/io";
 import CodeMirror from "@uiw/react-codemirror";
 import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
 import { Link, useParams } from "react-router-dom";
-import { Code, LogOut, UserPen,Bookmark} from "lucide-react";
+import { Code, LogOut, UserPen, Bookmark, Plus, Check } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
@@ -48,6 +54,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  isFollowing,
+  followUser,
+  unFollowUser,
+} from "../services/subscription";
 
 const Project = () => {
   const params = useParams();
@@ -56,7 +67,6 @@ const Project = () => {
   const project = projectList.find(
     (project) => project.id === params.projectId
   );
-
 
   const [html, setHtml] = useState(project.html);
   const [css, setCss] = useState(project.css);
@@ -69,17 +79,23 @@ const Project = () => {
   const [alert, setAlert] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [existingDocId, setExistingDocId] = useState(null);
- const [bookmarked, setBookmarked] = useState(false);
- 
+  const [bookmarked, setBookmarked] = useState(false);
+  const [follow, setFollow] = useState(false);
 
   const handleLogout = async () => {
     await logOut();
     dispatch(logout());
   };
 
-    useEffect(() => {
+  useEffect(() => {
+    if (!user?.uid || !project) return;
     isBookMarked(user.uid, project.id).then(setBookmarked);
-  }, [project.id, user.uid]);
+  }, [project, user]);
+
+  useEffect(() => {
+    if (!user?.uid || !project?.user?.uid) return;
+    isFollowing(user.uid, project.user.uid).then(setFollow);
+  }, [project, user]);
 
   const handleToggleBookmark = async () => {
     if (bookmarked) {
@@ -88,6 +104,16 @@ const Project = () => {
     } else {
       await bookmarkProject(user.uid, project.id);
       setBookmarked(true);
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    if (follow) {
+      await unFollowUser(user.uid, project.user.uid);
+      setFollow(false);
+    } else {
+      await followUser(user.uid, project.user.uid);
+      setFollow(true);
     }
   };
 
@@ -243,31 +269,42 @@ const Project = () => {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-semibold shadow-md cursor-pointer"
+                onClick={handleToggleFollow}
               >
-                + Follow
+                {follow ? (
+                  <div className="flex items-center gap-1">
+                    <Check className="w-4 h-4" />
+                    Unfollow
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Plus className="w-4 h-4" />
+                    Follow
+                  </div>
+                )}
               </motion.button>
             </div>
           )}
         </div>
-       
+
         {/* Right Section: Save + User */}
         <div className="flex items-center gap-5">
-
-             {/* Bookmark Icon */}
-        {
-            bookmarked? (
-              <div>
-                <FaBookmark 
-                className="w-8 h-8 text-white cursor-pointer" 
-                onClick={handleToggleBookmark}/>
-              </div>
-            ) : (
-              <div>
-                <Bookmark className="w-8 h-8 text-white cursor-pointer"
-                 onClick={handleToggleBookmark} />
-              </div>
-            )
-          } 
+          {/* Bookmark Icon */}
+          {bookmarked ? (
+            <div>
+              <FaBookmark
+                className="w-8 h-8 text-white cursor-pointer"
+                onClick={handleToggleBookmark}
+              />
+            </div>
+          ) : (
+            <div>
+              <Bookmark
+                className="w-8 h-8 text-white cursor-pointer"
+                onClick={handleToggleBookmark}
+              />
+            </div>
+          )}
           {/* Save Button */}
           {user.uid === project.user.uid && (
             <motion.button

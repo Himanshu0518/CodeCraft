@@ -1,4 +1,4 @@
-import { Home, Code, Heart, Bookmark } from "lucide-react";
+import { Home, Code, Heart, Bookmark, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 
 const items = [
@@ -20,7 +21,7 @@ const items = [
   },
   {
     title: "Following",
-    url: "#",
+    url: "/home/following",
     icon: Heart,
   },
   {
@@ -101,6 +102,18 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="border-t border-slate-800 px-4 py-4">
+        <div className="text-xs text-slate-400 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+              <Code className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-semibold text-slate-300">CodeCraft</span>
+          </div>
+          <p className="mb-1">Built for developers, by developers</p>
+          <p className="text-slate-600">© 2025</p>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
