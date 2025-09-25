@@ -326,7 +326,12 @@ const NewProject = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-slate-700" />
                 <DropdownMenuItem className="flex items-center justify-between px-3 py-2 rounded-md hover:bg-slate-800 cursor-pointer">
-                  Profile <UserPen className="w-4 h-4 text-slate-400" />
+                  <Link
+                    to={`/home/profile/${user.uid}`}
+                    className="flex items-center gap-2"
+                  >
+                    Profile <UserPen className="w-4 h-4 text-slate-400" />
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => handleLogout()}
