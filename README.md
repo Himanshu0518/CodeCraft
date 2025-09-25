@@ -55,9 +55,9 @@ Experience CodeCraft in action: **[codecraft-2f10d.web.app](https://codecraft-2f
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React ** - Component-based UI library with hooks and context
+- **React** - Component-based UI library with hooks and context
 - **Vite** - Next-generation frontend tooling for faster builds
-- **JavaScript ** - Modern JavaScript with async/await and modules
+- **JavaScript** - Modern JavaScript with async/await and modules
 - **TailwindCSS** - Utility-first CSS framework for rapid styling
 - **Shadcn/ui** - Reusable component library built on Radix UI
 - **Framer Motion** - Production-ready motion library for React
@@ -94,14 +94,12 @@ Experience CodeCraft in action: **[codecraft-2f10d.web.app](https://codecraft-2f
 
 3. **Environment Configuration**
    ```bash
-  
 VITE_FIREBASE_API_KEY = 
 VITE_FIREBASE_AUTH_DOMAIN = 
 VITE_FIREBASE_PROJECT_ID = 
 VITE_FIREBASE_STORAGE_BUCKET = 
 VITE_FIREBASE_MESSAGING_SENDER_ID = 
 VITE_FIREBASE_APP_ID = 
-
    ```
 
 4. **Start development server**
