@@ -6,7 +6,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import { Code, LogOut, UserPen } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
@@ -75,6 +75,7 @@ const NewProject = () => {
   const [alert, setAlert] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [existingDocId, setExistingDocId] = useState(null);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logOut();
@@ -143,7 +144,10 @@ const NewProject = () => {
         type: "success",
       });
 
-      setTimeout(() => setAlert({ show: false }), 3000);
+      setTimeout(()=>{
+        setAlert({ show: false });
+        navigate("/home");
+      },1500);
     } catch (err) {
       console.error("Error saving project:", err);
       setAlert({
@@ -166,19 +170,24 @@ const NewProject = () => {
         />
       )}
       <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Project already exists</AlertDialogTitle>
-            <AlertDialogDescription>
+        <AlertDialogContent className="bg-slate-900 rounded-2xl shadow-xl border border-slate-700 max-w-md mx-auto">
+          <AlertDialogHeader className="p-6">
+            <AlertDialogTitle className="text-lg font-bold text-white mb-2">
+              Project Already Exists
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-300">
               A project with the same title already exists. Do you want to
               override it?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="flex justify-end gap-3 p-6">
+            <AlertDialogCancel className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white transition">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md"
               onClick={() => {
-                saveProjectToDB(existingDocId); // ✅ Use same doc ID → overwrite
+                saveProjectToDB(existingDocId);
                 setOpenDialog(false);
               }}
             >
@@ -187,6 +196,8 @@ const NewProject = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      
 
       <header className="w-full h-20 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shadow-md">
         {/* Left Section: Logo + Title */}

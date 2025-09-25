@@ -1,4 +1,4 @@
-                                          #  CodeCraft
+#  CodeCraft
 
 > A modern, full-featured web development platform inspired by CodePen, enabling developers to create, share, and collaborate on web projects in real-time.
 

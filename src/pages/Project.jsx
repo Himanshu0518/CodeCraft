@@ -12,13 +12,14 @@ import CodeMirror from "@uiw/react-codemirror";
 import { html as htmlLang } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import { css as cssLang } from "@codemirror/lang-css";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Code, LogOut, UserPen, Bookmark, Plus, Check } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/features/authSlice";
 import { logOut } from "../services/auth";
 import { motion } from "framer-motion";
 import { db } from "../config/firebase.config";
+import Spinner from "../animations/Spinner";
 import {
   doc,
   setDoc,
@@ -27,6 +28,7 @@ import {
   where,
   getDocs,
   collection,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   isBookMarked,
@@ -60,27 +62,30 @@ import {
   unFollowUser,
 } from "../services/subscription";
 
+
 const Project = () => {
   const params = useParams();
-  const projectList = useSelector((state) => state.project.projectList);
+  const projectList = useSelector((state) => state.project?.projectList);
 
   const project = projectList.find(
-    (project) => project.id === params.projectId
+    (project) => project?.id === params?.projectId
   );
 
-  const [html, setHtml] = useState(project.html);
-  const [css, setCss] = useState(project.css);
-  const [js, setJs] = useState(project.js);
-  const [output, setOutput] = useState(project.output);
+  const [html, setHtml] = useState(project?.html || "");
+  const [css, setCss] = useState(project?.css || "");
+  const [js, setJs] = useState(project?.js || "");
+  const [output, setOutput] = useState(project?.output || "");
+
   const user = useSelector((state) => state.auth.userData);
   const dispatch = useDispatch();
-  //   const [isTitle, setIsTitle] = useState(false);
-  //   const [title, setTitle] = useState("Untitled");
   const [alert, setAlert] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [existingDocId, setExistingDocId] = useState(null);
   const [bookmarked, setBookmarked] = useState(false);
   const [follow, setFollow] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
+  const navigate = useNavigate();
+const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
     await logOut();
@@ -118,9 +123,9 @@ const Project = () => {
   };
 
   useEffect(() => {
-    setHtml(project.html);
-    setCss(project.css);
-    setJs(project.js);
+    setHtml(project?.html);
+    setCss(project?.css);
+    setJs(project?.js);
   }, [project]);
 
   useEffect(() => {
@@ -146,7 +151,7 @@ const Project = () => {
   }, [html, css, js]);
 
   const checkAndSave = async () => {
-    console.log("Save button clicked");
+    // console.log("Save button clicked");
 
     const q = query(
       collection(db, "Projects"),
@@ -162,6 +167,28 @@ const Project = () => {
       await saveProjectToDB(`${Date.now()}`);
     }
   };
+
+  const deleteProject = async () => {
+    try {
+      
+      setLoading(true);
+       await deleteDoc(doc(db, "Projects", project.id));     
+       navigate("/home") ;
+      setLoading(false);
+      
+    } catch (err) {
+      console.error("Error deleting project:", err);
+
+      setAlert({
+        show: true,
+        message: "Error deleting project!",
+        type: "error",
+      });
+
+      setTimeout(() => setAlert({ show: false }), 2000);
+    }
+  };
+
   const saveProjectToDB = async (id) => {
     const title = project.title;
     const _doc = {
@@ -185,7 +212,11 @@ const Project = () => {
         type: "success",
       });
 
-      setTimeout(() => setAlert({ show: false }), 3000);
+      setTimeout(()=>{
+        setAlert({ show: false });
+       
+      },1500);
+      
     } catch (err) {
       console.error("Error saving project:", err);
       setAlert({
@@ -198,6 +229,14 @@ const Project = () => {
     }
   };
 
+ if(loading){
+  return (
+    <div className="w-screen h-screen flex flex-col overflow-hidden bg-slate-900">
+      <Spinner />
+    </div>
+  )
+ }
+
   return (
     <div className="w-screen h-screen flex flex-col overflow-hidden bg-slate-900">
       {alert && (
@@ -207,28 +246,61 @@ const Project = () => {
           show={alert.show}
         />
       )}
-      <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Project already exists</AlertDialogTitle>
-            <AlertDialogDescription>
-              A project with the same title already exists. Do you want to
-              override it?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                saveProjectToDB(existingDocId);
-                setOpenDialog(false);
-              }}
-            >
-              Override
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+     <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+  <AlertDialogContent className="bg-slate-900 rounded-2xl shadow-xl border border-slate-700 max-w-md mx-auto">
+    <AlertDialogHeader className="p-6">
+      <AlertDialogTitle className="text-lg font-bold text-white mb-2">
+        Project Already Exists
+      </AlertDialogTitle>
+      <AlertDialogDescription className="text-sm text-gray-300">
+        A project with the same title already exists. Do you want to override it?
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter className="flex justify-end gap-3 p-6">
+      <AlertDialogCancel className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white transition">
+        Cancel
+      </AlertDialogCancel>
+      <AlertDialogAction
+        className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md"
+        onClick={() => {
+          saveProjectToDB(existingDocId);
+          setOpenDialog(false);
+        }}
+      >
+        Override
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
+
+    <AlertDialog open={deleteDialog} onOpenChange={setDeleteDialog}>
+  <AlertDialogContent className="bg-slate-900 rounded-2xl shadow-xl border border-red-700 max-w-md mx-auto">
+    <AlertDialogHeader className="p-6">
+      <AlertDialogTitle className="text-lg font-bold text-white mb-2">
+        Are You Sure You Want to Delete This Project?
+      </AlertDialogTitle>
+      <AlertDialogDescription className="text-sm text-gray-300">
+        This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter className="flex justify-end gap-3 p-6">
+      <AlertDialogCancel className="px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white transition">
+        Cancel
+      </AlertDialogCancel>
+      <AlertDialogAction
+        className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition shadow-md"
+        onClick={() => {
+          deleteProject();
+          setDeleteDialog(false); // Close the dialog immediately
+        }}
+      >
+        Delete
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
 
       <header className="w-full h-20 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shadow-md">
         {/* Left Section: Logo + Title */}
@@ -260,7 +332,9 @@ const Project = () => {
             <div className="flex items-center gap-3">
               {/* Username */}
               <p className="text-sm font-medium text-slate-300 truncate max-w-[150px]">
-                {user ? user.displayName : user.email?.split("@")[0]}
+                {project.user
+                  ? project.user.displayName
+                  : project.user.email?.split("@")[0]}
               </p>
 
               {/* Follow Button */}
@@ -289,6 +363,17 @@ const Project = () => {
 
         {/* Right Section: Save + User */}
         <div className="flex items-center gap-5">
+          {user.uid === project.user.uid && (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-400 to-rose-500 hover:from-red-600 hover:to-rose-700 text-white text-sm font-semibold shadow-lg transition-colors"
+              onClick={() => setDeleteDialog(true)}
+            >
+              Delete
+            </motion.button>
+          )}
+
           {/* Bookmark Icon */}
           {bookmarked ? (
             <div>
