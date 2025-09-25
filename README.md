@@ -1,4 +1,4 @@
-# 🎨 CodeCraft
+                                          #  CodeCraft
 
 > A modern, full-featured web development platform inspired by CodePen, enabling developers to create, share, and collaborate on web projects in real-time.
 
@@ -18,7 +18,7 @@ CodeCraft is a comprehensive web development platform that empowers developers t
 - **Responsive Design**: Optimized for all devices and screen sizes
 - **Performance Optimized**: Built with Vite for lightning-fast development and production builds
 
-## 🚀 Live Demo
+##  Live Demo
 
 Experience CodeCraft in action: **[codecraft-2f10d.web.app](https://codecraft-2f10d.web.app/)**
 
@@ -94,12 +94,12 @@ Experience CodeCraft in action: **[codecraft-2f10d.web.app](https://codecraft-2f
 
 3. **Environment Configuration**
    ```bash
-VITE_FIREBASE_API_KEY = 
-VITE_FIREBASE_AUTH_DOMAIN = 
-VITE_FIREBASE_PROJECT_ID = 
-VITE_FIREBASE_STORAGE_BUCKET = 
-VITE_FIREBASE_MESSAGING_SENDER_ID = 
-VITE_FIREBASE_APP_ID = 
+    VITE_FIREBASE_API_KEY=your_api_key
+    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+    VITE_FIREBASE_PROJECT_ID=your_project_id
+    VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+    VITE_FIREBASE_APP_ID=your_app_id 
    ```
 
 4. **Start development server**
@@ -128,9 +128,9 @@ CodeCraft/
 │   └── vite.svg              # Application favicon and branding
 ├── node_modules/              # Dependencies
 ├── src/
-│   ├── 🎨 animations/
-│   ├── 🧱 assets/            # Static assets (images, icons, fonts)
-│   ├── 🔧 components/         # Reusable React components
+│   ├──  animations/
+│   ├──  assets/            # Static assets (images, icons, fonts)
+│   ├──  components/         # Reusable React components
 │   │   └── ui/               # Shadcn/ui design system components
 │   │       ├── Alert.jsx     # Alert notifications
 │   │       ├── AppSideBar.jsx # Application sidebar navigation
@@ -139,17 +139,17 @@ CodeCraft/
 │   │       ├── Header.jsx    # Main header component
 │   │       ├── ProjectCard.jsx # Project display cards
 │   │       └── Protected.jsx # Route protection wrapper
-│   ├── ⚙️ config/            # Configuration files
-│   ├── 🎯 features/          # Feature-based component organization
+│   ├──  config/            # Configuration files
+│   ├──  features/          # Feature-based component organization
 │   │   ├── authSlice.js       # Redux slice for authentication
 │   │   ├── projectSlice.js   # Redux slice for project management
 │   │   └── searchSlice.js    # Redux slice for search functionality
-│   ├── 🪝 hooks/             # Custom React hooks
-│   ├── 🎨 layouts/           # Layout components
+│   ├──  hooks/             # Custom React hooks
+│   ├──  layouts/           # Layout components
 │   │   ├── AuthLayout.jsx    # Authentication page layouts
 │   │   └── RootLayout.jsx    # Main application layout
-│   ├── 📚 lib/               # Utility libraries and helpers
-│   ├── 📄 pages/             # Route components (page-level)
+│   ├──  lib/               # Utility libraries and helpers
+│   ├──  pages/             # Route components (page-level)
 │   │   ├── Bookmarks.jsx     # User bookmarks page
 │   │   ├── Following.jsx     # Following users page
 │   │   ├── Home.jsx          # Landing/home page
@@ -159,11 +159,11 @@ CodeCraft/
 │   │   ├── Project.jsx       # Individual project view
 │   │   ├── SignupPage.jsx    # User registration page
 │   │   └── YourWork.jsx      # User's projects dashboard
-│   ├── 🔧 services/          # External service integrations
+│   ├── services/          # External service integrations
 │   │   ├── auth.js           # Firebase authentication service
 │   │   ├── bookmarks.js      # Bookmark management service
 │   │   └── subscriptions.js  # User follow/following service
-│   ├── 🗄️ stores/           # State management (Redux store)
+│   ├──  stores/           # State management (Redux store)
 │   │   ├── store.js          # Main Redux store configuration
 │   │   └── index.css         # Global styles and CSS variables
 │   ├── main.jsx              # Application entry point
